@@ -1,4 +1,4 @@
-# IBM UrbanCode Deploy IBM Installation Manager Plugin
+# IBM UrbanCode Deploy IBM Installation Manager Plugin [![Build Status](https://travis-ci.org/IBM-UrbanCode/IBM-Installation-Manager-UCD.svg?branch=master)](https://travis-ci.org/IBM-UrbanCode/IBM-Installation-Manager-UCD)
 ---
 Note: This is not the plugin distributable! This is the source code. To find the installable plugin, go into the 'Releases' tab, and download a stable version.
 
