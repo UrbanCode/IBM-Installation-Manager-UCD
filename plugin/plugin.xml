@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  © Copyright IBM Corporation 2014, 2016.
+  This is licensed under the following license.
+  The Eclipse Public 1.0 License (http://www.eclipse.org/legal/epl-v10.html)
+  U.S. Government Users Restricted Rights:  Use, duplication or disclosure restricted by GSA ADP Schedule Contract with IBM Corp.
+-->
+<plugin xmlns="http://www.urbancode.com/PluginXMLSchema_v1" xmlns:server="http://www.urbancode.com/PluginServerXMLSchema_v1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <header>
+    <identifier id="com.ibm.urbancode.air.plugin.IBMInstallationManager" name="IBM Installation Manager" version="4"/>
+    <description>
+This plugin allows for uninstalling/installing packages through IBM Installation Manager.
+	  </description>
+    <tag>Installers/IBM/Installation Manager</tag>
+  </header>
+  <step-type name="Execute Response File">
+    <description>Execute a response file using IBM Installation Manager</description>
+    <properties>
+      <property name="responseFile" required="true">
+        <property-ui label="Response File Location" type="textBox"/>
+      </property>
+      <property name="dataLocation">
+        <property-ui description="The path to Installation Managers application data." hidden="true" label="Data Location" type="textBox"/>
+      </property>
+      <property name="imclLocation" required="true">
+        <property-ui default-value="/opt/IBM/InstallationManager/eclipse/tools/imcl" description="Full path to imcl executable." label="IMCL Path" type="textBox"/>
+      </property>
+	  <property name="responseFileVariables" required="false">
+        <property-ui description="[IBM Installation Manager 1.8 and higher]. Use one comma to separate variables and two commas if a value contains a comma: var1=val1,,val2,,val3,var2=val4,var3=val5" label="Response File Variables" type="textAreaBox"/>
+      </property>
+	  <property name="secureStorageFile" required="false">
+	  	<property-ui description="A Secure Storage File contains passwords for Respositories that require authentication" hidden="true" label="Secure Storage File" type="textBox"/>
+	  </property>
+	  <property name="masterPasswordFile" required="false">
+	  	<property-ui description="The master password file is a text file that contains a passphrase to secure the Storage File. This file should have OS permissions set appropriately." hidden="true" label="Master Password File" type="textBox"/>
+	  </property>
+    </properties>
+    <post-processing><![CDATA[
+        if (properties.get("exitCode") != 0) {
+            properties.put(new java.lang.String("Status"), new java.lang.String("Failure"));
+        }
+        else {
+            properties.put("Status", "Success");
+        }
+     ]]></post-processing>
+    <command program="${GROOVY_HOME}/bin/groovy">
+      <arg value="-cp"/>
+      <arg path="classes:lib/groovy-plugin-utils-1.0.jar"/>
+      <arg file="execute.groovy"/>
+      <arg file="${PLUGIN_INPUT_PROPS}"/>
+      <arg file="${PLUGIN_OUTPUT_PROPS}"/>
+    </command>
+  </step-type>
+    <step-type name="Install or Upgrade IBM Installation Manager">
+    <description>Install or upgrade IBM Installation Manager</description>
+    <properties>
+      <property name="mode" required="true">
+      <property-ui description="Administrator/root or nonadministrator are supported. Group is not supported." hidden="false" label="Mode" type="selectBox"/>
+      <value label="administrator">administrator</value>
+      <value label="nonadministrator">nonadministrator</value>
+      </property>
+      <property name="log" required="false">
+        <property-ui description="The name of the file where the log will be written." hidden="false" label="Installation Log" type="textBox"/>
+      </property>
+      <property name="installationDirectory" required="false">
+        <property-ui description="The path where IBM Installation Manager will be installed." hidden="true" label="Installation Directory" type="textBox"/>
+      </property>
+      <property name="dataLocation" required="false">
+        <property-ui description="The path to Installation Managers application data." hidden="true" label="Data Location" type="textBox"/>
+      </property>
+      <property name="installationKitDirectory" required="true">
+      	<property-ui description="Directory where the Installation Kit was unzipped" hidden="false" label="Directory where the Installation Kit was unzipped" type="textBox"/>
+      </property>
+    </properties>
+    <post-processing><![CDATA[
+        if (properties.get("exitCode") != 0) {
+            properties.put(new java.lang.String("Status"), new java.lang.String("Failure"));
+        }
+        else {
+            properties.put("Status", "Success");
+        }
+     ]]></post-processing>
+    <command program="${GROOVY_HOME}/bin/groovy">
+      <arg value="-cp"/>
+      <arg path="classes:lib/groovy-plugin-utils-1.0.jar"/>
+      <arg file="installIM.groovy"/>
+      <arg file="${PLUGIN_INPUT_PROPS}"/>
+      <arg file="${PLUGIN_OUTPUT_PROPS}"/>
+    </command>
+  </step-type>
+     <step-type name="Uninstall IBM Installation Manager">
+    <description>Uninstall IBM Installation Manager</description>
+    <properties>
+      <property name="mode" required="true">
+      <property-ui description="Administrator/root or nonadministrator are supported. Group is not supported." hidden="false" label="Mode" type="selectBox"/>
+      <value label="administrator">administrator</value>
+      <value label="nonadministrator">nonadministrator</value>
+      </property>
+      <property name="dataLocation" required="true">
+        <property-ui description="The path to Installation Managers application data." hidden="false" label="Data Location" type="textBox"/>
+      </property>
+    </properties>
+    <post-processing><![CDATA[
+        if (properties.get("exitCode") != 0) {
+            properties.put(new java.lang.String("Status"), new java.lang.String("Failure"));
+        }
+        else {
+            properties.put("Status", "Success");
+        }
+     ]]></post-processing>
+    <command program="${GROOVY_HOME}/bin/groovy">
+      <arg value="-cp"/>
+      <arg path="classes:lib/groovy-plugin-utils-1.0.jar"/>
+      <arg file="uninstallIM.groovy"/>
+      <arg file="${PLUGIN_INPUT_PROPS}"/>
+      <arg file="${PLUGIN_OUTPUT_PROPS}"/>
+    </command>
+  </step-type>
+</plugin>

@@ -1,0 +1,140 @@
+/**
+ * © Copyright IBM Corporation 2014.  
+ * This is licensed under the following license.
+ * The Eclipse Public 1.0 License (http://www.eclipse.org/legal/epl-v10.html)
+ * U.S. Government Users Restricted Rights:  Use, duplication or disclosure restricted by GSA ADP Schedule Contract with IBM Corp. 
+ */
+
+Here is how to use the plugin to install or uninstall but it can be used to read any response file:
+
+1) Upload the releases/IMPlugin_v1.zip file as a plugin into UCD under "Settings" tab -> "Automation Plugins" -> "Load Plugin".
+2) Create a component for WAS.
+3) Create a Component File Template in component (Components -> CompName -> Configuration -> Configuration File Templates) named install.xml.
+4) Put response file in template body.
+5) Create Install process.
+6) Add Install Template Step to process (Resource Tools -> Configuration Management -> Install Template).
+7) Use install.xml as file name.
+8) Add Execute Response File step. 
+9) Set IMCL path to the full path to imcl on the agent.
+10) Set Response File Location to install.xml.
+11) Attach Start -> Install Template -> Execute Response File -> Finish.
+12) Attach Component To application and map agents to environment.
+13) Create application process using the Install Component step with the websphere component you just created.
+
+ASSUMPTIONS:
+
+Agent is linux x86_64(only because my responseFile is for that).
+Installation Manager is installed on the agent machine.
+Install media for WebSphere BASE v85 is available as a local file path(once again was base 85 because thats what the response file expects.
+
+APPLICABLE CHANGES TO INSTALL.XML TEMPLATE
+Update the repository location to be accurate. You can use properties for this as needed.
+I am using an environment property @respositoryLocation@ which the install template step will detokenize for me from the value of an environment property called repositoryLocation.
+
+If not using WAS 8.5 or not using 64-bit, update the install.xml /agent-input/install/offering@features to reference the 32-bit for sdk and /agent-input/install/offering@id to be the correct package id.
+Also note that this install template is install was to /app/IBM/was85test/AppServer. You may wish to change this. You can use environment properties if you like.
+i.e. for install location specify @installLocation@ instead of /app/IBM... and then set a property on the environment with were to install it.
+
+
+<?xml version="1.0" encoding="UTF-8"?>
+<agent-input acceptLicense="true" clean="true" temporary="true">
+  <server>
+    <repository location="@repositoryLocation@"/>
+  </server>
+  <install modify="false">
+    <offering profile="IBM WebSphere Application Server V85_was85test_was85_node1" features="core.feature,ejbdeploy,thinclient,embeddablecontainer,com.ibm.sdk.6_64bit" id="com.ibm.websphere.BASE.v85"/>
+  </install>
+  <profile id="IBM WebSphere Application Server V85_was85test_was85_node1" installLocation="/app/IBM/was85test/AppServer">
+    <data key="eclipseLocation" value="/app/IBM/was85test/AppServer"/>
+    <data key="user.import.profile" value="false"/>
+    <data key="cic.selector.nl" value="en"/>
+  </profile>
+  <preference name="com.ibm.cic.common.core.preferences.eclipseCache" value="/app/IBM/SDP70Shared"/>
+  <preference name="com.ibm.cic.common.core.preferences.preserveDownloadedArtifacts" value="true"/>
+  <preference name="com.ibm.cic.common.core.preferences.keepFetchedFiles" value="false"/>
+  <preference name="com.ibm.cic.common.core.preferences.connectTimeout" value="30"/>
+  <preference name="com.ibm.cic.common.core.preferences.readTimeout" value="45"/>
+  <preference name="com.ibm.cic.common.core.preferences.downloadAutoRetryCount" value="0"/>
+  <preference name="offering.service.repositories.areUsed" value="false"/>
+<!--  <preference name="http.ntlm.auth.kind" value="NTLM"/>
+  <preference name="http.ntlm.auth.enableIntegrated.win32" value="true"/>-->
+  <preference name="com.ibm.cic.common.core.preferences.searchForUpdates" value="false"/>
+</agent-input>
+
+
+This is a simple uninstall.xml to uninstall this installed profile. To make this work, create an uninstall process that looks like the same as the install process, except use uninstall.xml for file names.
+<?xml version="1.0"?>
+<agent-input>
+  <uninstall>
+    <offering profile="IBM WebSphere Application Server V85_was85test_was85_node1"/>
+  </uninstall>
+</agent-input>
+
+WHAT'S NEW IN VERSION 2:
+
+Starting with version 2, you can use Response file variables which were introduced in IBM Installation Manager 1.8.0. Response File variables are documented here:
+http://www-01.ibm.com/support/knowledgecenter/SSDV2W_1.8.0/com.ibm.silentinstall12.doc/topics/r_silent_install_variable.html
+
+Example:
+
+To install IBM WebSphere Application Server 8.5.5.2, proceed as follows:
+
+1. Record a Response file from the repositories of IBM WebSphere Application Server 8.5.5 and IBM WebSphere Application Server 8.5.5.2, choosing to install directly the version 8.5.5.2.
+2. Add inside the Response File the declaration of variables that will be used to replace all hardcoded paths
+2. Replace any hardcoded values in the Response file with the Installation Manager variables, as in the following file:
+
+<?xml version='1.0' encoding='UTF-8'?>
+<agent-input>
+  <variables>
+   <variable name='sharedLocation' value='/opt/IBM/IMShared'/>
+   <variable name='WAS855RepositoryLocation' />
+   <variable name='WAS8552RepositoryLocation' />
+   <variable name='WAS8552InstallLocation' />
+
+  </variables>
+  <server>
+    <repository location='${WAS855RepositoryLocation}'/>
+    <repository location='${WAS8552RepositoryLocation}'/>
+  </server>
+  <profile id='IBM WebSphere Application Server V8.5' installLocation='${WAS8552InstallLocation}'>
+    <data key='eclipseLocation' value='${WAS8552InstallLocation}'/>
+    <data key='user.import.profile' value='false'/>
+    <data key='cic.selector.os' value='linux'/>
+    <data key='cic.selector.arch' value='x86'/>
+    <data key='cic.selector.ws' value='gtk'/>
+    <data key='cic.selector.nl' value='en'/>
+  </profile>
+  <install modify='false'>
+    <!-- IBM WebSphere Application Server 8.5.5.2 -->
+    <offering profile='IBM WebSphere Application Server V8.5' id='com.ibm.websphere.BASE.v85' version='8.5.5002.20140408_1947' features='core.feature,ejbdeploy,thinclient,embeddablecontainer,com.ibm.sdk.6_64bit' installFixes='none'/>
+  </install>
+  <preference name='com.ibm.cic.common.core.preferences.eclipseCache' value='${sharedLocation}'/>
+  <preference name='com.ibm.cic.common.core.preferences.connectTimeout' value='30'/>
+  <preference name='com.ibm.cic.common.core.preferences.readTimeout' value='45'/>
+  <preference name='com.ibm.cic.common.core.preferences.downloadAutoRetryCount' value='0'/>
+  <preference name='offering.service.repositories.areUsed' value='false'/>
+  <preference name='com.ibm.cic.common.core.preferences.ssl.nonsecureMode' value='false'/>
+  <preference name='com.ibm.cic.common.core.preferences.http.disablePreemptiveAuthentication' value='false'/>
+  <preference name='http.ntlm.auth.kind' value='NTLM'/>
+  <preference name='http.ntlm.auth.enableIntegrated.win32' value='true'/>
+  <preference name='com.ibm.cic.common.core.preferences.preserveDownloadedArtifacts' value='true'/>
+  <preference name='com.ibm.cic.common.core.preferences.keepFetchedFiles' value='false'/>
+  <preference name='PassportAdvantageIsEnabled' value='false'/>
+  <preference name='com.ibm.cic.common.core.preferences.searchForUpdates' value='false'/>
+  <preference name='com.ibm.cic.agent.ui.displayInternalVersion' value='false'/>
+  <preference name='com.ibm.cic.common.sharedUI.showErrorLog' value='true'/>
+  <preference name='com.ibm.cic.common.sharedUI.showWarningLog' value='true'/>
+  <preference name='com.ibm.cic.common.sharedUI.showNoteLog' value='true'/>
+</agent-input>
+
+3. Define variables in IBM UrbanCode Deploy to have the desired values for the particular Environment. These could be either Environment or Component Environment variables.
+You can define the environment variables with the same names used in the response file, as the syntax to reference them is different and there will be no conflict:
+WAS855RepositoryLocation
+WAS8552RepositoryLocation
+WAS8552InstallLocation
+
+4. Configure the step: Execute Response File
+
+5. Add the following values to the property: responseFileVariables, with the following value:
+
+WAS855RepositoryLocation=${p:environment/WAS855RepositoryLocation},WAS8552RepositoryLocation=${p:environment/WAS8552RepositoryLocation},WAS8552InstallLocation=${p:environment/WAS8552InstallLocation}
