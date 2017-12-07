@@ -16,6 +16,11 @@ This plug-in is protected under the [Eclipse Public 1.0 License](http://www.ecli
 	a new distributable zip within the releases folder. Use this command if you wish to make
 	your own changes to the plugin.
 
+### Step List
+- **Execute Response File**: Execute a `imcl` response file using IBM Installation Manager. This step can be used to install all products that use the IBM Installation Manager for installation.
+- **Install or Upgrade IBM Installation Manager**: Install or Upgrade IBM Installation Manager from a IBM Installation Manager installer.
+- **Uninstall IBM Installation Manager**: Uninstall the currently installed IBM Installation Manager.
+
 ### History
     Version 4
         Community GitHub Release

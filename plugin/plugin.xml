@@ -14,7 +14,7 @@ This plugin allows for uninstalling/installing packages through IBM Installation
     <tag>Installers/IBM/Installation Manager</tag>
   </header>
   <step-type name="Execute Response File">
-    <description>Execute a response file using IBM Installation Manager</description>
+    <description>Execute a `imcl` response file using IBM Installation Manager. This step can be used to install all products that use the IBM Installation Manager for installation.</description>
     <properties>
       <property name="responseFile" required="true">
         <property-ui label="Response File Location" type="textBox"/>
@@ -52,7 +52,7 @@ This plugin allows for uninstalling/installing packages through IBM Installation
     </command>
   </step-type>
     <step-type name="Install or Upgrade IBM Installation Manager">
-    <description>Install or upgrade IBM Installation Manager</description>
+    <description>Install or Upgrade IBM Installation Manager from a IBM Installation Manager installer.</description>
     <properties>
       <property name="mode" required="true">
       <property-ui description="Administrator/root or nonadministrator are supported. Group is not supported." hidden="false" label="Mode" type="selectBox"/>
@@ -89,7 +89,7 @@ This plugin allows for uninstalling/installing packages through IBM Installation
     </command>
   </step-type>
      <step-type name="Uninstall IBM Installation Manager">
-    <description>Uninstall IBM Installation Manager</description>
+    <description>Uninstall the currently installed IBM Installation Manager.</description>
     <properties>
       <property name="mode" required="true">
       <property-ui description="Administrator/root or nonadministrator are supported. Group is not supported." hidden="false" label="Mode" type="selectBox"/>
